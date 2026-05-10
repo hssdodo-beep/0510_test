@@ -3,321 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>스티커 메모장</title>
+    <title>디지털데이: 혁신의 기록</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-        
         body {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Pretendard', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
+        .main-card {
+            background-color: #1a2233;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .memo-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .memo-card:hover {
-            transform: translateY(-4px) rotate(-1deg);
-        }
-
-        .tape-effect {
+        .timeline-line {
             position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%) rotate(-2deg);
-            width: 64px;
-            height: 32px;
-            background-color: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(4px);
+            left: 1.25rem;
+            top: 2rem;
+            bottom: 2rem;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+        /* Custom Message Box Animation */
+        #message-box {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(100px);
+            opacity: 0;
             pointer-events: none;
         }
-
-        @keyframes modal-in {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        #message-box.show {
+            transform: translateY(0);
+            opacity: 1;
         }
-
-        .modal-animate {
-            animation: modal-in 0.2s ease-out forwards;
+        @media print {
+            .no-print { display: none; }
+            body { padding: 0; background: white; color: black; }
+            .main-card { box-shadow: none; border: none; width: 100%; max-width: none; background: white; color: black; }
+            .text-white, .text-slate-300, .text-slate-400 { color: black !important; }
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-900">
+<body>
 
-    <div id="app" class="p-4 md:p-8 max-w-6xl mx-auto">
-        <!-- 헤더 섹션 -->
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
-                    <span class="bg-yellow-400 w-8 h-8 rounded shadow-sm inline-block"></span>
-                    스티커 메모장
-                </h1>
-                <p class="text-slate-500 mt-1">중요한 생각을 제목과 함께 기록해보세요.</p>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-3">
-                <!-- 검색 -->
-                <div class="relative flex-1 md:flex-none">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input 
-                        type="text" 
-                        id="searchInput"
-                        placeholder="검색..." 
-                        class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full md:w-56 transition-all"
-                    >
-                </div>
-
-                <!-- 정렬 버튼 -->
-                <button 
-                    id="sortBtn"
-                    class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors whitespace-nowrap"
-                >
-                    <i data-lucide="arrow-up-down" class="w-4 h-4"></i>
-                    <span id="sortLabel">최신순</span>
-                </button>
-
-                <!-- 추가 버튼 -->
-                <button 
-                    onclick="openModal()"
-                    class="flex items-center gap-2 px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold rounded-full shadow-lg shadow-yellow-200 transition-all active:scale-95"
-                >
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                    새 메모
-                </button>
-            </div>
-        </header>
-
-        <!-- 메모 그리드 -->
-        <div id="memoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- 메모 카드들이 여기에 동적으로 생성됩니다 -->
+    <div class="main-card p-8 md:p-12 relative">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold mb-2">
+                <span class="text-cyan-400">디지털데이</span>: <span class="text-white">혁신의 기록</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl font-medium">Digital Day: Connect & Innovate</p>
         </div>
 
-        <!-- 빈 상태 표시 -->
-        <div id="emptyState" class="hidden py-20 text-center text-slate-400 col-span-full">
-            <p class="text-lg">등록된 메모가 없습니다.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+            <!-- Left Column: Info -->
+            <div class="space-y-10">
+                <!-- 행사 안내 -->
+                <section>
+                    <div class="flex items-center gap-3 mb-4 text-cyan-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <h2 class="text-xl font-bold text-white">행사 안내</h2>
+                    </div>
+                    <ul class="space-y-3 text-slate-300 ml-1">
+                        <li class="flex gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 일시:</span>
+                            <span>11.15.(금) 오전 9시 ~ 오후 4시</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 장소:</span>
+                            <span>메인 컨퍼런스 홀 (테크 센터 1F)</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 대상:</span>
+                            <span>전 임직원 및 기술 파트너사</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- 준비물 -->
+                <section>
+                    <div class="flex items-center gap-3 mb-4 text-purple-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><rect width="20" height="4" x="2" y="16" rx="2"/></svg>
+                        <h2 class="text-xl font-bold text-white">준비물</h2>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        개인 노트북 및 충전기, 사원증,<br>
+                        호기심 가득한 눈빛, <span class="text-cyan-400 font-semibold text-lg">그리고 세상을 바꿀 아이디어!</span>
+                    </p>
+                </section>
+
+                <!-- 주요 세션 -->
+                <section>
+                    <div class="flex items-center gap-3 mb-4 text-emerald-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/></svg>
+                        <h2 class="text-xl font-bold text-white">주요 세션</h2>
+                    </div>
+                    <ul class="space-y-3 text-slate-300 ml-1">
+                        <li class="flex items-start gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 키노트 스피치:</span>
+                            <span>미래 기술 트렌드 2026</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 기술 워크숍:</span>
+                            <span>생성형 AI 실무 적용 사례</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 해커톤 발표:</span>
+                            <span>혁신 아이디어 데모데이</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-white font-semibold whitespace-nowrap">• 네트워킹 및 기술 체험 존</span>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- Right Column: Time Table -->
+            <div class="bg-[#111827] rounded-3xl p-6 md:p-8 relative">
+                <div class="flex items-center gap-3 mb-8 text-cyan-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <h2 class="text-2xl font-bold text-white">Time Table</h2>
+                </div>
+
+                <div class="relative space-y-10">
+                    <div class="timeline-line"></div>
+
+                    <!-- Item 1 -->
+                    <div class="relative flex items-start gap-6 z-10">
+                        <div class="w-10 h-10 rounded-full bg-cyan-600 flex items-center justify-center shrink-0 font-bold text-white shadow-lg shadow-cyan-900/20">1</div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">09:00 ~ 10:00</p>
+                            <h3 class="text-lg font-bold text-white mb-1">오프닝 & 키노트 스피치</h3>
+                            <p class="text-sm text-slate-400">기술 총괄 본부</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="relative flex items-start gap-6 z-10">
+                        <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center shrink-0 font-bold text-white shadow-lg shadow-purple-900/20">2</div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">10:00 ~ 12:00</p>
+                            <h3 class="text-lg font-bold text-white mb-1">마이크로 세션 (테크톡)</h3>
+                            <p class="text-sm text-slate-400">개발 파트 및 기획 파트</p>
+                        </div>
+                    </div>
+
+                    <!-- Lunch -->
+                    <div class="relative flex items-start gap-6 z-10">
+                        <div class="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center shrink-0 font-bold text-white shadow-lg shadow-slate-900/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">12:00 ~ 13:30</p>
+                            <h3 class="text-lg font-bold text-white mb-1">네트워킹 런치 (케이터링 서비스)</h3>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="relative flex items-start gap-6 z-10">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 font-bold text-white shadow-lg shadow-emerald-900/20">3</div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">13:30 ~ 15:30</p>
+                            <h3 class="text-lg font-bold text-white mb-1">해커톤 최종 데모데이</h3>
+                            <p class="text-sm text-slate-400">예선 통과 10개 팀</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div class="relative flex items-start gap-6 z-10">
+                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center shrink-0 font-bold text-white shadow-lg shadow-blue-900/20">4</div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1">15:30 ~ 16:00</p>
+                            <h3 class="text-lg font-bold text-white mb-1">어워즈 및 클로징</h3>
+                            <p class="text-sm text-slate-400">참여자 전원</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons Section -->
+        <div class="no-print grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-8 mt-4">
+            <button onclick="handleDownload()" class="flex items-center justify-center gap-2 bg-[#3b66f5] hover:bg-[#2d52d1] text-white font-semibold py-3 px-6 rounded-xl transition-all hover:scale-[1.02] shadow-lg active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                안내문 내려받기
+            </button>
+            <button onclick="showMessage('참가 신청이 완료되었습니다!')" class="flex items-center justify-center gap-2 bg-[#c48d2e] hover:bg-[#a67625] text-white font-semibold py-3 px-6 rounded-xl transition-all hover:scale-[1.02] shadow-lg active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                참가 신청하기
+            </button>
+            <button onclick="addToGoogleCalendar()" class="flex items-center justify-center gap-2 bg-[#449368] hover:bg-[#367a54] text-white font-semibold py-3 px-6 rounded-xl transition-all hover:scale-[1.02] shadow-lg active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                일정 추가하기
+            </button>
+        </div>
+
+        <!-- Footer Decor -->
+        <div class="mt-12 flex justify-center gap-4 no-print">
+            <div class="w-24 h-1.5 rounded-full bg-cyan-500"></div>
+            <div class="w-24 h-1.5 rounded-full bg-purple-500"></div>
+            <div class="w-24 h-1.5 rounded-full bg-emerald-500"></div>
         </div>
     </div>
 
-    <!-- 작성/수정 모달 -->
-    <div id="modalOverlay" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden modal-animate">
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 id="modalTitle" class="font-bold text-slate-800">새로운 메모 작성</h3>
-                <button onclick="closeModal()" class="p-1 hover:bg-slate-100 rounded-full transition-colors">
-                    <i data-lucide="x" class="w-5 h-5 text-slate-400"></i>
-                </button>
-            </div>
-            
-            <form id="memoForm" class="p-6 space-y-4">
-                <input type="hidden" id="editMemoId">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">제목</label>
-                    <input
-                        type="text"
-                        id="memoTitleInput"
-                        placeholder="제목을 입력하세요 (선택)"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all font-bold text-slate-800"
-                    >
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">내용</label>
-                    <textarea
-                        id="memoContentInput"
-                        placeholder="메모 내용을 입력하세요..."
-                        class="w-full h-48 p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all resize-none text-lg text-slate-700"
-                    ></textarea>
-                </div>
-            </form>
-
-            <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3">
-                <button onclick="closeModal()" class="px-5 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors">취소</button>
-                <button 
-                    onclick="saveMemo()"
-                    class="flex items-center gap-2 px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold rounded-lg shadow-md transition-all active:scale-95"
-                >
-                    <i data-lucide="check" class="w-5 h-5"></i>
-                    저장하기
-                </button>
-            </div>
-        </div>
+    <!-- Message Box Overlay -->
+    <div id="message-box" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 border border-white/20 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-50 no-print">
+        <svg xmlns="http://www.w3.org/2000/svg" class="text-cyan-400" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <span id="message-text" class="font-medium"></span>
     </div>
 
     <script>
-        // 초기 데이터 및 상태
-        const STICKER_COLORS = [
-            'bg-yellow-100 border-yellow-200 text-yellow-900',
-            'bg-pink-100 border-pink-200 text-pink-900',
-            'bg-blue-100 border-blue-200 text-blue-900',
-            'bg-green-100 border-green-200 text-green-900',
-            'bg-orange-100 border-orange-200 text-orange-900',
-            'bg-purple-100 border-purple-200 text-purple-900',
-        ];
-
-        let memos = [
-            {
-                id: 1,
-                title: '환영합니다! 👋',
-                content: '제목과 내용을 자유롭게 기록해보세요.',
-                color: STICKER_COLORS[0],
-                createdAt: new Date().toISOString()
-            }
-        ];
-
-        let sortOrder = 'latest'; // 'latest', 'oldest', 'title'
-        let searchTerm = '';
-
-        // DOM 요소
-        const memoGrid = document.getElementById('memoGrid');
-        const emptyState = document.getElementById('emptyState');
-        const searchInput = document.getElementById('searchInput');
-        const sortBtn = document.getElementById('sortBtn');
-        const sortLabel = document.getElementById('sortLabel');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const memoForm = document.getElementById('memoForm');
-
-        // 초기화
-        function init() {
-            lucide.createIcons();
-            renderMemos();
+        let timer;
+        function showMessage(text) {
+            const box = document.getElementById('message-box');
+            const msgText = document.getElementById('message-text');
             
-            // 이벤트 바인딩
-            searchInput.addEventListener('input', (e) => {
-                searchTerm = e.target.value;
-                renderMemos();
-            });
-
-            sortBtn.addEventListener('click', toggleSort);
-        }
-
-        // 정렬 기능
-        function toggleSort() {
-            if (sortOrder === 'latest') sortOrder = 'oldest';
-            else if (sortOrder === 'oldest') sortOrder = 'title';
-            else sortOrder = 'latest';
+            msgText.innerText = text;
+            box.classList.add('show');
             
-            const labels = { 'latest': '최신순', 'oldest': '오래된순', 'title': '제목순' };
-            sortLabel.textContent = labels[sortOrder];
-            renderMemos();
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                box.classList.remove('show');
+            }, 3000);
         }
 
-        // 메모 렌더링
-        function renderMemos() {
-            let filtered = memos.filter(m => 
-                m.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                m.content.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+        function handleDownload() {
+            window.print();
+        }
 
-            filtered.sort((a, b) => {
-                if (sortOrder === 'latest') return new Date(b.createdAt) - new Date(a.createdAt);
-                if (sortOrder === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
-                if (sortOrder === 'title') return a.title.localeCompare(b.title, 'ko');
-                return 0;
-            });
-
-            memoGrid.innerHTML = '';
+        function addToGoogleCalendar() {
+            const eventTitle = "디지털데이: 혁신의 기록";
+            const startDate = "20241115T090000"; // YYYYMMDDTHHMMSS
+            const endDate = "20241115T160000";
+            const location = "메인 컨퍼런스 홀 (테크 센터 1F)";
+            const details = "Digital Day: Connect & Innovate - 키노트 스피치, 기술 워크숍, 해커톤 데모데이 등이 진행됩니다.";
             
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                filtered.forEach(memo => {
-                    const card = document.createElement('div');
-                    card.className = `${memo.color} memo-card p-6 rounded-sm shadow-md border-t-8 h-72 flex flex-col relative group cursor-default`;
-                    
-                    const dateStr = new Date(memo.createdAt).toLocaleDateString('ko-KR');
-                    
-                    card.innerHTML = `
-                        <div class="tape-effect"></div>
-                        <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="openModal(${memo.id})" class="p-1.5 hover:bg-white/40 rounded-full"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteMemo(${memo.id})" class="p-1.5 hover:bg-white/40 rounded-full text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </div>
-                        <h2 class="text-xl font-bold mb-3 pr-8 truncate border-b border-black/5 pb-1">${memo.title}</h2>
-                        <div class="flex-1 overflow-y-auto whitespace-pre-wrap text-base leading-relaxed scrollbar-hide opacity-90">${memo.content}</div>
-                        <div class="mt-4 text-[10px] uppercase tracking-wider opacity-60 font-mono">${dateStr}</div>
-                    `;
-                    memoGrid.appendChild(card);
-                });
-            }
-            lucide.createIcons();
+            // Google Calendar URL template
+            const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+            
+            // Open in new tab
+            window.open(googleUrl, '_blank');
+            showMessage('구글 캘린더 등록 페이지로 이동합니다.');
         }
-
-        // 모달 제어
-        function openModal(id = null) {
-            const modalTitle = document.getElementById('modalTitle');
-            const titleInput = document.getElementById('memoTitleInput');
-            const contentInput = document.getElementById('memoContentInput');
-            const editId = document.getElementById('editMemoId');
-
-            if (id) {
-                const memo = memos.find(m => m.id === id);
-                modalTitle.textContent = '메모 수정하기';
-                editId.value = memo.id;
-                titleInput.value = memo.title;
-                contentInput.value = memo.content;
-            } else {
-                modalTitle.textContent = '새로운 메모 작성';
-                editId.value = '';
-                titleInput.value = '';
-                contentInput.value = '';
-            }
-
-            modalOverlay.classList.remove('hidden');
-            contentInput.focus();
-        }
-
-        function closeModal() {
-            modalOverlay.classList.add('hidden');
-        }
-
-        // 메모 저장/수정
-        function saveMemo() {
-            const titleInput = document.getElementById('memoTitleInput');
-            const contentInput = document.getElementById('memoContentInput');
-            const editId = document.getElementById('editMemoId').value;
-
-            if (!contentInput.value.trim()) return;
-
-            if (editId) {
-                // 수정
-                memos = memos.map(m => m.id === parseInt(editId) ? {
-                    ...m,
-                    title: titleInput.value.trim() || '제목 없음',
-                    content: contentInput.value
-                } : m);
-            } else {
-                // 추가
-                const randomColor = STICKER_COLORS[Math.floor(Math.random() * STICKER_COLORS.length)];
-                memos.push({
-                    id: Date.now(),
-                    title: titleInput.value.trim() || '제목 없음',
-                    content: contentInput.value,
-                    color: randomColor,
-                    createdAt: new Date().toISOString()
-                });
-            }
-
-            closeModal();
-            renderMemos();
-        }
-
-        // 메모 삭제
-        function deleteMemo(id) {
-            // 사용자 확인 대신 직관적인 삭제 (원하실 경우 confirm 추가 가능)
-            memos = memos.filter(m => m.id !== id);
-            renderMemos();
-        }
-
-        window.onload = init;
     </script>
 </body>
 </html>
